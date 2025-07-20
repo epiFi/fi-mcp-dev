@@ -95,7 +95,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("DEBUG: Login - storing sessionId: %s, phoneNumber: %s", sessionId, phoneNumber)
 	authMiddleware.AddSession(sessionId, phoneNumber)
+	log.Printf("DEBUG: Login - session stored successfully")
 
 	tmpl, err := template.ParseFiles("static/login_successful.html")
 	if err != nil {
