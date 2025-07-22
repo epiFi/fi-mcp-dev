@@ -28,4 +28,8 @@ var ToolList = []ToolInfo{
 		Name:        "fetch_bank_transactions",
 		Description: "Retrieve detailed bank transactions for each bank account connected to Fi money platform.",
 	},
+	{
+		Name:        "fetch_stock_transactions",
+		Description: "Retrieve detailed indian stock transactions for all connected indian stock accounts to Fi money platform.",
+	},
 }
