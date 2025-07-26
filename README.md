@@ -136,6 +136,9 @@ if __name__ == "__main__":
 
 ```
 
+### Requirements:
+- fastmcp (`pip install mcp`)
+
 ## Simple google adk example
 ```py
 from google.adk.agents.llm_agent import LlmAgent
@@ -153,8 +156,12 @@ root_agent = LlmAgent(
     tools=[toolset],
 )
 ```
+### Requirements:
+- google-adk(>=1.8.0) (`pip install google-adk`)
+- `export GOOGLE_API_KEY=YOUR_API_KEY`
+- Run `adk web` in parent directory
 
-Make sure `GOOGLE_API_KEY` environment variable is exported properly and also make sure you have latest `google-adk` package version in your project(>=1.8.0) then run `adk web` after that. If you are using `skip_auth` branch you should directly get data as shown
+If you are using `skip_auth` branch you should directly get data as shown
 <img width="1134" height="545" alt="Screenshot 2025-07-27 at 03 57 08" src="https://github.com/user-attachments/assets/df4d377c-4bce-4d1a-b2da-48303b7907ea" />
 
 ## FAQ
