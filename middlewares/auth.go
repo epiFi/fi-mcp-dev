@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -18,6 +19,7 @@ var (
 )
 
 type AuthMiddleware struct {
+	mu           sync.RWMutex
 	sessionStore map[string]string
 }
 
@@ -32,7 +34,7 @@ func (m *AuthMiddleware) AuthMiddleware(next server.ToolHandlerFunc) server.Tool
 		// fetch sessionId from context
 		// this gets populated for every tool call
 		sessionId := server.ClientSessionFromContext(ctx).SessionID()
-		phoneNumber, ok := m.sessionStore[sessionId]
+		phoneNumber, ok := m.lookupPhone(sessionId)
 		if !ok {
 			loginUrl := m.getLoginUrl(sessionId)
 			return mcp.NewToolResultText(fmt.Sprintf(loginRequiredJson, loginUrl)), nil
@@ -53,9 +55,29 @@ func (m *AuthMiddleware) AuthMiddleware(next server.ToolHandlerFunc) server.Tool
 
 // GetLoginUrl fetches dynamic login url for given sessionId
 func (m *AuthMiddleware) getLoginUrl(sessionId string) string {
-	return fmt.Sprintf("http://localhost:%s/mockWebPage?sessionId=%s", pkg.GetPort(), sessionId)
+	return pkg.LoginURL(sessionId)
+}
+
+func (m *AuthMiddleware) lookupPhone(sessionID string) (string, bool) {
+	m.mu.RLock()
+	phone, ok := m.sessionStore[sessionID]
+	m.mu.RUnlock()
+	if ok && phone != "" {
+		return phone, true
+	}
+	return pkg.ResolvePhone("", false, pkg.GetAllowedMobileNumbers())
 }
 
 func (m *AuthMiddleware) AddSession(sessionId, phoneNumber string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	m.sessionStore[sessionId] = phoneNumber
+}
+
+// SessionPhone returns the phone bound by a completed login, if any.
+func (m *AuthMiddleware) SessionPhone(sessionID string) (string, bool) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	phone, ok := m.sessionStore[sessionID]
+	return phone, ok
 }

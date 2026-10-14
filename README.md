@@ -95,6 +95,24 @@ FI_MCP_PORT=8080 go run .
 
 The server will start on [http://localhost:8080](http://localhost:8080).
 
+### Login link host
+
+Login links default to `http://localhost:$FI_MCP_PORT`. Set `FI_MCP_PUBLIC_URL` when the browser that opens the link is not on that same machine (Docker, Codespaces, or a tunnel). A localhost link in that setup is a common reason the client keeps asking for login.
+
+```sh
+FI_MCP_PUBLIC_URL=https://my-tunnel.example FI_MCP_PORT=8080 go run .
+```
+
+Clients must also keep sending the same `Mcp-Session-Id`. A new session id is a new login.
+
+### Optional pinned test phone
+
+For a local hackathon you can skip the browser login by pinning one allowed test phone. Leave this unset for the normal login page. The value must match a directory in `test_data_dir`.
+
+```sh
+FI_MCP_LOGIN_PHONE=1111111111 go run .
+```
+
 ## Usage
 - Follow instructions in this [guide](https://fi.money/features/getting-started-with-fi-mcp) to setup client
 - Replace url with locally running server, for example: `http://localhost:8080/mcp/stream`
