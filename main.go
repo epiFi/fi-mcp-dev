@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -88,10 +89,14 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionId := r.FormValue("sessionId")
-	phoneNumber := r.FormValue("phoneNumber")
+	phoneNumber := strings.TrimSpace(r.FormValue("phoneNumber"))
 
 	if sessionId == "" || phoneNumber == "" {
 		http.Error(w, "sessionId and phoneNumber are required", http.StatusBadRequest)
+		return
+	}
+	if !pkg.MobileNumberAllowed(phoneNumber, pkg.GetAllowedMobileNumbers()) {
+		http.Error(w, "phone number is not allowed", http.StatusBadRequest)
 		return
 	}
 
